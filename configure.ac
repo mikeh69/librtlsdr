@@ -10,6 +10,7 @@ m4_ifdef([AM_SILENT_RULES], [AM_SILENT_RULES([yes])])
 dnl checks for programs
 AC_PROG_MAKE_SET
 AC_PROG_CC
+AC_PROG_CC_STDC
 AC_PROG_INSTALL
 AM_PROG_CC_C_O
 LT_INIT
@@ -62,7 +63,7 @@ AC_SUBST(SYMBOL_VISIBILITY)
 
 AC_MSG_CHECKING(whether compiler understands -Wall)
 old_CFLAGS="$CFLAGS"
-CFLAGS="$CFLAGS -Wall -Wextra -Wno-unused-parameter -Wno-unused -Wsign-compare -Wdeclaration-after-statement"
+CFLAGS="$CFLAGS -Wall -Wextra -Wno-unused-parameter -Wno-unused -Wsign-compare"
 AC_TRY_COMPILE([],[],
   AC_MSG_RESULT(yes),
   AC_MSG_RESULT(no)
