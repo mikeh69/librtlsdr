@@ -55,6 +55,7 @@ if(CMAKE_COMPILER_IS_GNUCC AND NOT WIN32)
     ADD_DEFINITIONS(-Wdeclaration-after-statement)
     #http://gcc.gnu.org/wiki/Visibility
     add_definitions(-fvisibility=hidden)
+#    ADD_DEFINITIONS(-std=c99)
 endif()
 
 ########################################################################
@@ -168,3 +169,4 @@ INSTALL(
 ########################################################################
 MESSAGE(STATUS "Building for version: ${VERSION} / ${LIBVER}")
 MESSAGE(STATUS "Using install prefix: ${CMAKE_INSTALL_PREFIX}")
+MESSAGE(STATUS "Output name: ${OUTPUT_NAME}")

@@ -1,5 +1,5 @@
 AC_INIT([librtlsdr],
-        m4_esyscmd([./git-version-gen .tarball-version]),
+        [0.666],
         [osmocom-sdr@lists.osmocom.org])
 
 AM_INIT_AUTOMAKE([dist-bzip2])
@@ -10,7 +10,6 @@ m4_ifdef([AM_SILENT_RULES], [AM_SILENT_RULES([yes])])
 dnl checks for programs
 AC_PROG_MAKE_SET
 AC_PROG_CC
-AC_PROG_CC_STDC
 AC_PROG_INSTALL
 AM_PROG_CC_C_O
 LT_INIT
@@ -47,6 +46,9 @@ AC_CHECK_LIB(m, sqrt, [LIBS="$LIBS -lm"])
 dnl libmath (for rtl_power)
 AC_CHECK_LIB(m, atan2, [LIBS="$LIBS -lm"])
 
+dnl libmath (for librtlsdr)
+AC_CHECK_LIB(m, log, [LIBS="$LIBS -lm"])
+
 dnl librealtime (for rtl_test)
 AC_CHECK_LIB(rt, clock_gettime, [LIBS="$LIBS -lrt"])
 
@@ -63,7 +65,7 @@ AC_SUBST(SYMBOL_VISIBILITY)
 
 AC_MSG_CHECKING(whether compiler understands -Wall)
 old_CFLAGS="$CFLAGS"
-CFLAGS="$CFLAGS -Wall -Wextra -Wno-unused-parameter -Wno-unused -Wsign-compare"
+CFLAGS="$CFLAGS -Wall -Wextra -Wno-unused-parameter -Wno-unused -Wsign-compare -Wdeclaration-after-statement"
 AC_TRY_COMPILE([],[],
   AC_MSG_RESULT(yes),
   AC_MSG_RESULT(no)
