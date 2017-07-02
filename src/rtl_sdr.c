@@ -24,6 +24,7 @@
 
 #ifndef _WIN32
 #include <unistd.h>
+#include <getopt.h>  // needed in C99, not in C90!
 #else
 #include <windows.h>
 #include <io.h>

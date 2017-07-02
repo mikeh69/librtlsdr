@@ -28,6 +28,7 @@
 #endif
 
 #include <libusb.h>
+#include <math.h>  // for log()
 
 /*
  * All libusb callback functions should be marked with the LIBUSB_CALL macro
@@ -570,7 +571,7 @@ void rtlsdr_set_gpio_output(rtlsdr_dev_t *dev, uint8_t gpio)
 	gpio = 1 << gpio;
 
 	r = rtlsdr_read_reg(dev, SYSB, GPD, 1);
-	rtlsdr_write_reg(dev, SYSB, GPD, r & ~gpio, 1);
+	rtlsdr_write_reg(dev, SYSB, GPO, r & ~gpio, 1);
 	r = rtlsdr_read_reg(dev, SYSB, GPOE, 1);
 	rtlsdr_write_reg(dev, SYSB, GPOE, r | gpio, 1);
 }
@@ -1692,6 +1693,65 @@ int rtlsdr_read_sync(rtlsdr_dev_t *dev, void *buf, int len, int *n_read)
 	return libusb_bulk_transfer(dev->devh, 0x81, buf, len, n_read, BULK_TIMEOUT);
 }
 
+int rtlsdr_read_power_dB(rtlsdr_dev_t *dev, void *buf, int len, int *n_read)
+{
+	if (!dev)
+		return -1;
+
+	int tfr_result = libusb_bulk_transfer(dev->devh, 0x81, buf, len, n_read, BULK_TIMEOUT);
+	if (tfr_result < 0)
+		return tfr_result;
+		
+	int total = 0;
+	int num_bytes = *n_read;
+	unsigned char *byte_buf = (unsigned char*)buf;
+	for (int i = 0; i < num_bytes; i++)
+	{
+		int next_samp = (int)(byte_buf[i]);
+		next_samp += next_samp - 255;  // subtract DC offset 127.5
+		total += (next_samp * next_samp);
+	}
+	return (int)(10 * (log(total) - log(num_bytes)));
+}
+
+int rtlsdr_read_offset_I(rtlsdr_dev_t *dev, void *buf, int len, int *n_read)
+{
+	if (!dev)
+		return -1;
+
+	int tfr_result = libusb_bulk_transfer(dev->devh, 0x81, buf, len, n_read, BULK_TIMEOUT);
+	if (tfr_result < 0)
+		return tfr_result;
+		
+	int total = 0;
+	int num_bytes = *n_read;
+	unsigned char *byte_buf = (unsigned char*)buf;
+	for (int i = 0; i < num_bytes; i+= 2)
+	{
+		total += byte_buf[i];
+	}
+	return total;
+}
+
+int rtlsdr_read_offset_Q(rtlsdr_dev_t *dev, void *buf, int len, int *n_read)
+{
+	if (!dev)
+		return -1;
+
+	int tfr_result = libusb_bulk_transfer(dev->devh, 0x81, buf, len, n_read, BULK_TIMEOUT);
+	if (tfr_result < 0)
+		return tfr_result;
+		
+	int total = 0;
+	int num_bytes = *n_read;
+	unsigned char *byte_buf = (unsigned char*)buf;
+	for (int i = 1; i < num_bytes; i+= 2)
+	{
+		total += byte_buf[i];
+	}
+	return total;
+}
+
 static void LIBUSB_CALL _libusb_callback(struct libusb_transfer *xfer)
 {
 	rtlsdr_dev_t *dev = (rtlsdr_dev_t *)xfer->user_data;
@@ -1936,15 +1996,4 @@ int rtlsdr_i2c_read_fn(void *dev, uint8_t addr, uint8_t *buf, int len)
 		return rtlsdr_i2c_read(((rtlsdr_dev_t *)dev), addr, buf, len);
 
 	return -1;
-}
-
-int rtlsdr_set_bias_tee(rtlsdr_dev_t *dev, int on)
-{
-	if (!dev)
-		return -1;
-
-	rtlsdr_set_gpio_output(dev, 0);
-	rtlsdr_set_gpio_bit(dev, 0, on);
-
-	return 0;
 }
