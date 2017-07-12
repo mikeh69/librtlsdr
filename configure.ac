@@ -66,7 +66,7 @@ AC_SUBST(SYMBOL_VISIBILITY)
 
 AC_MSG_CHECKING(whether compiler understands -Wall)
 old_CFLAGS="$CFLAGS"
-CFLAGS="$CFLAGS -Wall -Wextra -Wno-unused-parameter -Wno-unused -Wsign-compare -Wdeclaration-after-statement"
+CFLAGS="$CFLAGS -Wall -Wextra -Wno-unused-parameter -Wno-unused -Wsign-compare"
 AC_TRY_COMPILE([],[],
   AC_MSG_RESULT(yes),
   AC_MSG_RESULT(no)
