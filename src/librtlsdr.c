@@ -1702,16 +1702,16 @@ int rtlsdr_read_power_dB(rtlsdr_dev_t *dev, void *buf, int len, int *n_read)
 	if (tfr_result < 0)
 		return tfr_result;
 		
-	int total = 0;
-	int num_bytes = *n_read;
+	unsigned int total = 0;
+	unsigned int num_bytes = *n_read;
 	unsigned char *byte_buf = (unsigned char*)buf;
-	for (int i = 0; i < num_bytes; i++)
+	for (unsigned int i = 0; i < num_bytes; i++)
 	{
 		int next_samp = (int)(byte_buf[i]);
 		next_samp += next_samp - 255;  // subtract DC offset 127.5
 		total += (next_samp * next_samp);
 	}
-	return (int)(10 * (log(total) - log(num_bytes)));
+	return (int)(10 * (log10(total) - log10(num_bytes)));
 }
 
 int rtlsdr_read_offset_I(rtlsdr_dev_t *dev, void *buf, int len, int *n_read)
